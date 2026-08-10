@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="today-head">
+  <div class="greet">
+    <div class="greet-date" id="date-label"></div>
+    <h1 class="greet-title" id="greet-title">Добрый день!</h1>
+    <p class="greet-sub muted" id="greet-sub"></p>
+  </div>
+  <div class="filters" id="filters">
+    <button class="chip active" data-status="">Все</button>
+    <button class="chip" data-status="pending">Ожидает</button>
+    <button class="chip" data-status="done">Готово</button>
+    <button class="chip" data-status="overdue">Просрочено</button>
+    <button class="chip" data-status="cancelled">Отменено</button>
+  </div>
+</section>
+
+<section id="reminders" class="list"></section>
+<div id="empty" class="empty hidden">
+  <div class="empty-icon">🌿</div>
+  <p>На сегодня всё спокойно.</p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/today.js') }}"></script>
+{% endblock %}

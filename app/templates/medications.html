@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="head-row">
+  <h1>Мои лекарства</h1>
+  <a class="btn btn-primary" href="/medications/new">+ Добавить</a>
+</div>
+<input id="med-search" class="search" type="search" placeholder="Поиск по названию…" autocomplete="off">
+<section id="med-list" class="list"></section>
+<div id="med-empty" class="empty hidden">
+  <div class="empty-icon">💊</div>
+  <p>Пока нет ни одного лекарства.</p>
+  <a class="btn btn-primary" href="/medications/new">Добавить первое</a>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/medications.js') }}"></script>
+{% endblock %}

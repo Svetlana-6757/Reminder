@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="head-row">
+  <h1>Лекарство</h1>
+  <div class="head-actions">
+    <a class="btn btn-ghost" href="/medications/{{ med.id }}/edit">Редактировать</a>
+    <button class="btn btn-ghost" id="btn-toggle">Пауза</button>
+    <button class="btn btn-danger" id="btn-delete">Удалить</button>
+  </div>
+</div>
+
+<section id="med-detail" class="card">
+  <div class="med-hero">
+    <span class="r-icon big">{{ med.icon }}</span>
+    <div>
+      <div class="med-title">{{ med.name }}</div>
+      <div class="status {{ med.status }}" id="med-status"></div>
+    </div>
+  </div>
+  <div class="detail-grid" id="med-meta"></div>
+  <div id="med-desc" class="desc-block"></div>
+</section>
+
+<h2 class="section-title">История приёма</h2>
+<section id="history" class="list"></section>
+<div id="hist-empty" class="empty hidden">
+  <p>История пока пуста.</p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>window.MED_ID = {{ med.id }};</script>
+<script src="{{ url_for('static', filename='js/detail.js') }}"></script>
+{% endblock %}

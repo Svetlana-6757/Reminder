@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2fb5a7">
+  <meta name="description" content="Вежливые напоминания о приёме лекарств">
+  <title>{{ app_name }}</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/favicon.ico" type="image/png">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">{{ app_icon }}</span>
+      <span class="brand-name">{{ app_name }}</span>
+    </div>
+    <nav class="nav">
+      <a class="nav-link {{ 'active' if page == 'today' }}" href="/">Сегодня</a>
+      <a class="nav-link {{ 'active' if page == 'medications' }}" href="/medications">Лекарства</a>
+      <a class="nav-link {{ 'active' if page == 'settings' }}" href="/settings">Настройки</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+  <div id="overlay-root"></div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

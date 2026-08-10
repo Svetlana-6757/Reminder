@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="head-row">
+  <h1>{% if med %}Редактирование{% else %}Новое лекарство{% endif %}</h1>
+</div>
+
+<form id="med-form" class="card form-card" autocomplete="off">
+  <label class="field-label">Иконка</label>
+  <div class="emoji-row">
+    {% for e in ['💊','💧','🌿','❤️','🫀','🦴','👁','🍬','💉','🌡','🧪','🩹','⚡','🍵','🧴','👃'] %}
+    <button type="button" class="emoji {{ 'sel' if med and med.icon == e }}" data-emoji="{{ e }}">{{ e }}</button>
+    {% endfor %}
+  </div>
+
+  <label class="field-label">Название</label>
+  <input id="f-name" required maxlength="200"
+         value="{{ med.name if med else '' }}" placeholder="Например, Парацетамол">
+
+  <label class="field-label">Краткое описание <span class="muted small">(от чего или скриншот из инструкции)</span></label>
+  <textarea id="f-desc" rows="3">{{ med.description if med else '' }}</textarea>
+
+  <label class="field-label">Дата начала приёма</label>
+  <input id="f-start" type="date" value="{{ med.start_date.isoformat() if med else today }}">
+
+  <label class="field-label">Срок приёма</label>
+  <div class="seg" id="seg-duration">
+    <button type="button" class="seg-item {{ 'sel' if not med or med.duration_type == 'permanent' }}" data-val="permanent">Постоянно</button>
+    <button type="button" class="seg-item {{ 'sel' if med and med.duration_type == 'days' }}" data-val="days">На дней</button>
+  </div>
+  <div id="days-wrap" class="{{ 'hidden' if not med or med.duration_type == 'permanent' }}">
+    <div class="inline">
+      <input id="f-days" type="number" min="1" max="365" value="{{ med.duration_days if med and med.duration_days else 7 }}">
+      <span class="muted">дней</span>
+    </div>
+  </div>
+
+  <label class="field-label">Количество раз в день</label>
+  <input id="f-times" type="number" min="1" max="12" value="{{ med.times_per_day if med else 1 }}">
+
+  <label class="field-label">Режим времени</label>
+  <div class="seg" id="seg-mode">
+    <button type="button" class="seg-item {{ 'sel' if not med or med.schedule_mode == 'exact' }}" data-val="exact">Точное время</button>
+    <button type="button" class="seg-item {{ 'sel' if med and med.schedule_mode == 'auto' }}" data-val="auto">Утром «Старт»</button>
+  </div>
+  <div id="exact-wrap">
+    <p class="muted small">Время приёма:</p>
+    <div id="times-list"></div>
+  </div>
+  <p id="auto-hint" class="hint {{ 'hidden' if not med or med.schedule_mode == 'exact' }}">
+    Каждое утро я напомню нажать «Старт» и сам равномерно распределю приёмы на
+    {{ 12 // (med.times_per_day if med and med.times_per_day else 1) }} часов бодрствования.
+  </p>
+
+  <label class="field-label">Условия приёма</label>
+  <div class="seg" id="seg-meal">
+    <button type="button" class="seg-item {{ 'sel' if not med or med.meal_condition == 'none' }}" data-val="none">Без условий</button>
+    <button type="button" class="seg-item {{ 'sel' if med and med.meal_condition == 'before' }}" data-val="before">До еды</button>
+    <button type="button" class="seg-item {{ 'sel' if med and med.meal_condition == 'after' }}" data-val="after">После еды</button>
+    <button type="button" class="seg-item {{ 'sel' if med and med.meal_condition == 'during' }}" data-val="during">Во время еды</button>
+  </div>
+  <div id="offset-wrap" class="{{ 'hidden' if not med or med.meal_condition not in ('before', 'after') }}">
+    <div class="inline">
+      <input id="f-offset" type="number" min="0" max="240" value="{{ med.meal_offset_minutes if med and med.meal_offset_minutes else 30 }}">
+      <span class="muted">минут</span>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary" id="btn-save">Сохранить</button>
+    <button type="button" class="btn btn-ghost" id="btn-cancel">Отмена</button>
+    {% if med %}
+    <button type="button" class="btn btn-danger" id="btn-delete">Удалить</button>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+  {% if med %}
+  window.MED_ID = {{ med.id }};
+  window.MED_TIMES = {{ med.exact_times_list|tojson }};
+  {% endif %}
+</script>
+<script src="{{ url_for('static', filename='js/form.js') }}"></script>
+{% endblock %}

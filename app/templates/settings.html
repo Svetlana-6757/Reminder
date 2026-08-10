@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="head-row">
+  <h1>Настройки</h1>
+</div>
+
+<form id="settings-form" class="card form-card" autocomplete="off">
+  <label class="field-label">Название приложения</label>
+  <input id="s-app-name" maxlength="40">
+
+  <label class="field-label">Иконка приложения</label>
+  <div class="emoji-row" id="app-icon-row">
+    {% for e in ['💊','🌿','❤️','⏰','📋','🍵','✨','🩺'] %}
+    <button type="button" class="emoji" data-emoji="{{ e }}">{{ e }}</button>
+    {% endfor %}
+  </div>
+  <div class="inline">
+    <input type="file" id="s-icon-file" accept="image/png,image/jpeg">
+    <span class="muted small">или загрузите свою картинку (PNG/JPG)</span>
+  </div>
+
+  <label class="field-label">Время «утреннего старта»</label>
+  <input id="s-wake" type="time">
+  <p class="hint">В это время придёт напоминание нажать «Старт» для лекарств в авто-режиме.</p>
+
+  <label class="field-label">Звук напоминания</label>
+  <select id="s-sound"></select>
+
+  <label class="field-label">Громкость</label>
+  <div class="inline">
+    <input id="s-volume" type="range" min="0" max="100" step="5">
+    <span class="muted" id="volume-label"></span>
+  </div>
+
+  <button type="submit" class="btn btn-primary" id="btn-save-settings">Сохранить</button>
+</form>
+
+<div class="card push-card">
+  <h3>Уведомления на телефоне</h3>
+  <p class="muted small">Включите, чтобы напоминания всплывали поверх всех окон, даже когда приложение закрыто.
+     Для этого на телефоне разрешите сайту показывать уведомления.</p>
+  <div class="form-actions">
+    <button type="button" class="btn btn-primary" id="btn-enable-push">Включить уведомления</button>
+    <button type="button" class="btn btn-ghost" id="btn-test-push">Проверочное уведомление</button>
+  </div>
+  <div class="muted small" id="push-status"></div>
+  <p class="hint">Подсказка: чтобы уведомления были максимально надёжными, добавьте сайт на главный экран
+     («Добавить на главный экран» в браузере телефона).</p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}
