@@ -2,6 +2,7 @@ import json
 
 from . import push
 from .events import hub
+from .logic import STATUS_LABELS
 
 
 def _payload(reminder, kind):
@@ -30,20 +31,25 @@ def _payload(reminder, kind):
     return {
         'type': 'reminder',
         'id': reminder.id,
+        'medication_id': med.id,
         'kind': kind,
         'title': title,
         'body': body,
+        'med_name': med.name,
+        'icon': med.icon,
+        'description': med.description or '',
+        'meal_label': meal,
+        'time': t,
+        'date_label': reminder.scheduled_for.strftime('%d.%m.%Y'),
+        'status': reminder.status,
+        'status_label': STATUS_LABELS.get(reminder.status, reminder.status),
+        'is_start_prompt': reminder.is_start_prompt,
         'url': '/?focus=' + str(reminder.id),
     }
 
 
 def fire(reminder, kind='due'):
     payload = _payload(reminder, kind)
-    hub.publish(json.dumps({
-        'type': 'reminder',
-        'id': reminder.id,
-        'kind': kind,
-        'title': payload['title'],
-        'body': payload['body'],
-    }))
+    hub.publish(json.dumps(payload, ensure_ascii=False))
     push.send_async(payload)
+

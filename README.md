@@ -27,80 +27,20 @@ python run.py
 
 Откройте http://127.0.0.1:5000
 
-# Установка на российском сервере (Ubuntu/Debian)
+# Запуск на российском сервере (VPS/VDS)
 
-```
-sudo apt update
-sudo apt install -y python3 python3-venv python3-pip nginx
-```
+Подробная пошаговая инструкция для новичка — в файле **[DEPLOY.md](DEPLOY.md)**.
+Она объясняет, что такое `REMINDER_SECRET` и `REMINDER_BASE_URL`, как их задать
+и как настроить systemd, Nginx, HTTPS и уведомления на телефоне.
 
-Скопируйте проект, затем:
-
-```
-cd Reminder
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-```
-
-Настройки через переменные окружения (в systemd):
+Коротко, настройки через переменные окружения (в systemd):
 
 - `REMINDER_TZ` — часовой пояс, по умолчанию `Europe/Moscow`
 - `REMINDER_SECRET` — секретный ключ Flask (обязательно смените!)
 - `REMINDER_BASE_URL` — публичный адрес, например `https://reminders.example.ru`
 
-## systemd-сервис (`/etc/systemd/system/reminder.service`)
-
-```ini
-[Unit]
-Description=Reminder app
-After=network.target
-
-[Service]
-WorkingDirectory=/opt/Reminder
-ExecStart=/opt/Reminder/.venv/bin/gunicorn -w 1 -k gthread --threads 8 --timeout 120 -b 127.0.0.1:5000 run:app
-Restart=always
-User=www-data
-Environment=REMINDER_SECRET=поменяйте-меня
-Environment=REMINDER_BASE_URL=https://reminders.example.ru
-
-[Install]
-WantedBy=multi-user.target
-```
-
-```
-sudo systemctl daemon-reload
-sudo systemctl enable --now reminder
-```
-
 > **Важно:** один worker (`-w 1`). Планировщик живёт в процессе приложения —
 > при нескольких воркерах напоминания будут дублироваться.
-
-## Nginx + HTTPS (обязательно для уведомлений)
-
-`/etc/nginx/sites-available/reminder`:
-
-```
-server {
-    listen 80;
-    server_name reminders.example.ru;
-
-    location / {
-        proxy_pass http://127.0.0.1:5000;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_buffering off;
-    }
-}
-```
-
-```
-sudo ln -s /etc/nginx/sites-available/reminder /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d reminders.example.ru
-```
 
 # Как включить уведомления на телефоне
 

@@ -392,6 +392,36 @@ input[type="range"] { padding: 0; accent-color: var(--accent); }
 .push-card { margin-top: 18px; }
 .push-card h3 { margin: 0 0 6px; }
 
+/* ---------- большое напоминание ---------- */
+.rem-overlay { z-index: 95; }
+.reminder-sheet { max-width: 440px; padding-top: 24px; }
+.rem-head { display: flex; align-items: flex-start; gap: 12px; }
+.rem-title-block { flex: 1; min-width: 0; }
+.rem-title { font-size: 21px; font-weight: 700; line-height: 1.25; }
+.rem-when { margin-top: 4px; color: var(--muted); font-size: 13.5px; }
+.rem-note { margin-top: 4px; color: var(--muted); font-size: 13.5px; }
+.rem-desc {
+  margin-top: 14px;
+  color: var(--ink);
+  font-size: 14.5px;
+  white-space: pre-wrap;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.rem-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.rem-actions .btn { flex: 1 1 45%; }
+.pulse { animation: pulse .8s ease 2; }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(47, 181, 167, 0); }
+  50% { box-shadow: 0 0 0 12px rgba(47, 181, 167, .25); }
+}
+
 @media (min-width: 640px) {
   .overlay { align-items: center; }
   .sheet { border-radius: 22px; width: 520px; }

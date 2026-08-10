@@ -16,7 +16,7 @@
   <input id="f-name" required maxlength="200"
          value="{{ med.name if med else '' }}" placeholder="Например, Парацетамол">
 
-  <label class="field-label">Краткое описание <span class="muted small">(от чего или скриншот из инструкции)</span></label>
+  <label class="field-label">Краткое описание <span class="muted small">(от чего помогает)</span></label>
   <textarea id="f-desc" rows="3">{{ med.description if med else '' }}</textarea>
 
   <label class="field-label">Дата начала приёма</label>

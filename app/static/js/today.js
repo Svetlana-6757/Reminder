@@ -90,64 +90,6 @@ async function loadToday() {
   }
 }
 
-function openPostpone(reminderId) {
-  const ov = showSheet(
-    '<h3>Перенести приём ⏰</h3>' +
-    '<div class="pp-presets">' +
-      '<button class="btn btn-ghost" data-m="30">Через 30 мин</button>' +
-      '<button class="btn btn-ghost" data-m="60">Через 1 час</button>' +
-      '<button class="btn btn-ghost" data-m="120">Через 2 часа</button>' +
-      '<button class="btn btn-ghost" data-m="180">Через 3 часа</button>' +
-    '</div>' +
-    '<label class="muted small">Или выберите своё время:</label>' +
-    '<input type="datetime-local" id="pp-dt" style="margin:8px 0 14px">' +
-    '<div class="form-actions">' +
-      '<button class="btn btn-primary" id="pp-ok">Перенести</button>' +
-      '<button class="btn btn-ghost" id="pp-cancel">Закрыть</button>' +
-    '</div>');
-
-  const doPostpone = (payload) =>
-    api('/api/reminders/' + reminderId + '/postpone', {
-      method: 'POST', body: JSON.stringify(payload),
-    }).then(() => {
-      ov.remove();
-      toast('Приём перенесён');
-      loadToday();
-    }).catch((e) => toast(e.message));
-
-  ov.querySelector('[data-m]').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const m = Number(e.target.dataset.m);
-    doPostpone({ minutes: m });
-  });
-  ov.querySelectorAll('[data-m]').forEach((b) =>
-    b.addEventListener('click', (e) => {
-      e.stopPropagation();
-      doPostpone({ minutes: Number(e.target.dataset.m) });
-    }));
-
-  ov.querySelector('#pp-ok').addEventListener('click', () => {
-    const v = document.getElementById('pp-dt').value;
-    if (v) {
-      const dt = new Date(v);
-      doPostpone({ at: dt.toISOString() });
-    } else {
-      doPostpone({ minutes: 60 });
-    }
-  });
-  ov.querySelector('#pp-cancel').addEventListener('click', () => ov.remove());
-}
-
-async function act(url, msg) {
-  try {
-    await api(url, { method: 'POST' });
-    toast(msg);
-    loadToday();
-  } catch (e) {
-    toast(e.message);
-  }
-}
-
 function bindActions() {
   const list = document.getElementById('reminders');
   list.addEventListener('click', (e) => {
@@ -168,7 +110,7 @@ function bindActions() {
     const id = actBtn.dataset.id;
     if (actBtn.dataset.act === 'done') act('/api/reminders/' + id + '/done', 'Принято ✅');
     else if (actBtn.dataset.act === 'cancel') act('/api/reminders/' + id + '/cancel', 'Напоминание отменено');
-    else if (actBtn.dataset.act === 'postpone') openPostpone(id);
+    else if (actBtn.dataset.act === 'postpone') window.postponeReminder(id);
   });
 }
 

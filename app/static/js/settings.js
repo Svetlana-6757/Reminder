@@ -64,6 +64,13 @@ async function initSettings() {
     document.getElementById('volume-label').textContent = vol.value + '%';
   });
 
+  const playBtn = document.getElementById('btn-play-sound');
+  playBtn.addEventListener('click', () => {
+    const a = new Audio('/static/sounds/' + sel.value);
+    a.volume = (Number(vol.value) || 70) / 100;
+    a.play().catch(() => toast('Не удалось воспроизвести звук'));
+  });
+
   document.getElementById('settings-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const iconEl = appIconRow.querySelector('.emoji.sel');
