@@ -2,8 +2,8 @@ import os
 
 from flask import Flask
 
-from config import (DATA_DIR, DB_PATH, MED_PHOTO_DIR, TIMEZONE, SECRET_KEY,
-                    BASE_URL)
+from config import (DATA_DIR, DB_PATH, ICON_DIR, MED_PHOTO_DIR, TIMEZONE,
+                    SECRET_KEY, BASE_URL)
 from .models import db, ensure_schema
 from .assets import ensure_assets
 from .seed import seed_defaults
@@ -34,10 +34,16 @@ def create_app():
 
     @app.context_processor
     def inject_settings():
+        import os
         from .models import Setting
+        custom = os.path.join(DATA_DIR, 'icons', 'custom-icon.png')
+        use_custom = os.path.exists(custom)
+        version = Setting.get('icon_version', '')
         return {
             'app_name': Setting.get('app_name', 'Напоминания'),
             'app_icon': Setting.get('app_icon', '💊'),
+            'app_icon_url': (f'/icon-192.png?v={version}') if use_custom else None,
+            'icon_version': version,
         }
 
     from .scheduler import SchedulerManager

@@ -1,6 +1,5 @@
 import math
 import os
-import shutil
 import struct
 import wave
 
@@ -60,9 +59,17 @@ def _ensure_icons():
         path = os.path.join(config.ICON_DIR, f'icon-{size}.png')
         if not os.path.exists(path):
             _draw_icon(size, path)
+    # Если custom-icon.png — это просто старый авто-копия стандартной иконки,
+    # убираем её, чтобы честно отличать «пользователь загрузил иконку» от «нет».
     custom = os.path.join(config.ICON_DIR, 'custom-icon.png')
-    if not os.path.exists(custom):
-        shutil.copy(os.path.join(config.ICON_DIR, 'icon-192.png'), custom)
+    if os.path.exists(custom):
+        try:
+            with open(custom, 'rb') as f1, \
+                    open(os.path.join(config.ICON_DIR, 'icon-192.png'), 'rb') as f2:
+                if f1.read() == f2.read():
+                    os.remove(custom)
+        except OSError:
+            pass
 
 
 # --------------------------------------------------------------- звуки

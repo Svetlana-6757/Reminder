@@ -379,7 +379,7 @@ def settings_save():
 
 @api_bp.route('/settings/icon', methods=['POST'])
 def settings_icon_upload():
-    import os
+    import time
     import config as _config
     file = request.files.get('icon')
     if not file:
@@ -393,7 +393,8 @@ def settings_icon_upload():
         out = os.path.join(_config.ICON_DIR, f'resize-{s}.png')
         if os.path.exists(out):
             os.remove(out)
-    return jsonify({'ok': True})
+    Setting.set('icon_version', str(int(time.time())))
+    return jsonify({'ok': True, 'version': Setting.get('icon_version')})
 
 
 @api_bp.route('/sounds')

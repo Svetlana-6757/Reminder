@@ -100,7 +100,12 @@ async function initSettings() {
       const res = await fetch('/api/settings/icon', { method: 'POST', body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Ошибка');
-      toast('Иконка обновлена. Обновите страницу (может понадобиться очистка кэша).');
+      // обновляем иконку в шапке и фавикон сразу, без перезагрузки
+      const br = document.querySelector('.brand-icon');
+      if (br) br.innerHTML = '<img src="/icon-192.png?v=' + (data.version || Date.now()) + '" alt="">';
+      const fav = document.querySelector('link[rel="icon"]');
+      if (fav) fav.href = '/favicon.ico?v=' + (data.version || Date.now());
+      toast('Иконка обновлена');
     } catch (err) { toast(err.message); }
   });
 
