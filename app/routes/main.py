@@ -109,6 +109,16 @@ def favicon():
     return _serve_icon(192)
 
 
+@main_bp.route('/med-photo/<int:mid>')
+def med_photo(mid):
+    med = db.session.get(Medication, mid)
+    if med is not None and med.photo:
+        path = os.path.join(config.MED_PHOTO_DIR, med.photo)
+        if os.path.exists(path):
+            return send_file(os.path.abspath(path))
+    abort(404)
+
+
 # ------------------------------------------------------------------ SSE
 
 @main_bp.route('/events')

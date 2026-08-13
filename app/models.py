@@ -24,6 +24,7 @@ class Medication(db.Model):
     # условия приёма: none | before | after | during
     meal_condition = db.Column(db.String(10), default='none')
     meal_offset_minutes = db.Column(db.Integer, default=0)
+    photo = db.Column(db.String(255), nullable=True)  # файл фото упаковки
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -113,4 +114,14 @@ class PushSubscription(db.Model):
     endpoint = db.Column(db.Text, nullable=False, unique=True)
     p256dh = db.Column(db.Text, nullable=False)
     auth = db.Column(db.Text, nullable=False)
+
+
+def ensure_schema():
+    """Лёгкая миграция для уже существующих баз (добавляет новые колонки)."""
+    from sqlalchemy import inspect, text
+    insp = inspect(db.engine)
+    cols = [c['name'] for c in insp.get_columns('medications')]
+    if 'photo' not in cols:
+        with db.engine.begin() as conn:
+            conn.execute(text('ALTER TABLE medications ADD COLUMN photo VARCHAR(255)'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

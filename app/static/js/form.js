@@ -6,6 +6,8 @@ let state = {
   meal: 'none',
   times: 1,
   exactTimes: [],
+  photoFile: null,
+  removePhoto: false,
 };
 
 function readState() {
@@ -93,17 +95,65 @@ async function submit() {
 
   const editing = window.MED_ID || null;
   try {
+    let med;
     if (editing) {
-      await api('/api/medications/' + editing, { method: 'PUT', body: JSON.stringify(payload) });
-      toast('Сохранено');
+      med = await api('/api/medications/' + editing, { method: 'PUT', body: JSON.stringify(payload) });
     } else {
-      await api('/api/medications', { method: 'POST', body: JSON.stringify(payload) });
-      toast('Лекарство добавлено 🌿');
+      med = await api('/api/medications', { method: 'POST', body: JSON.stringify(payload) });
     }
+
+    // фото
+    if (state.removePhoto) {
+      await api('/api/medications/' + med.id + '/photo', { method: 'DELETE' });
+    } else if (state.photoFile) {
+      const fd = new FormData();
+      fd.append('photo', state.photoFile);
+      const res = await fetch('/api/medications/' + med.id + '/photo', { method: 'POST', body: fd });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || 'Не удалось загрузить фото');
+      }
+    }
+
+    toast(editing ? 'Сохранено' : 'Лекарство добавлено 🌿');
     window.location.href = '/medications';
   } catch (e) {
     toast(e.message);
   }
+}
+
+// ---------- фото ----------
+function updatePhotoPreview() {
+  const prev = document.getElementById('photo-preview');
+  const removeBtn = document.getElementById('btn-remove-photo');
+  if (state.photoFile) {
+    prev.innerHTML = '<img src="' + URL.createObjectURL(state.photoFile) + '" alt="">';
+    removeBtn.classList.remove('hidden');
+  } else if (window.MED_HAS_PHOTO && !state.removePhoto) {
+    prev.innerHTML = '<img src="/med-photo/' + window.MED_ID + '" alt="">';
+    removeBtn.classList.remove('hidden');
+  } else {
+    prev.innerHTML = '<span class="photo-placeholder">📷</span>';
+    removeBtn.classList.add('hidden');
+  }
+}
+
+function bindPhoto() {
+  const input = document.getElementById('f-photo');
+  document.getElementById('btn-pick-photo').addEventListener('click', () => input.click());
+  input.addEventListener('change', () => {
+    const file = input.files[0];
+    if (!file) return;
+    state.photoFile = file;
+    state.removePhoto = false;
+    updatePhotoPreview();
+  });
+  document.getElementById('btn-remove-photo').addEventListener('click', () => {
+    state.photoFile = null;
+    input.value = '';
+    state.removePhoto = window.MED_HAS_PHOTO && !state.photoFile;
+    updatePhotoPreview();
+  });
 }
 
 function init() {
@@ -119,6 +169,8 @@ function init() {
   syncUI();
 
   bindSeg();
+  bindPhoto();
+  updatePhotoPreview();
 
   f.addEventListener('input', () => {
     readState();

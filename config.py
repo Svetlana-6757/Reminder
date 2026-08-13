@@ -5,6 +5,7 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 DB_PATH = os.path.join(DATA_DIR, 'reminder.db')
 VAPID_PATH = os.path.join(DATA_DIR, 'vapid.json')
 ICON_DIR = os.path.join(DATA_DIR, 'icons')
+MED_PHOTO_DIR = os.path.join(DATA_DIR, 'med_photos')
 
 # Часовой пояс сервера (в нём считаются напоминания)
 TIMEZONE = os.environ.get('REMINDER_TZ', 'Europe/Moscow')

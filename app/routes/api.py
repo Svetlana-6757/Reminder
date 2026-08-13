@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import date, datetime, timedelta
 
 from flask import Blueprint, current_app, jsonify, request
@@ -191,6 +192,11 @@ def medication_delete(mid):
     med, err, code = _get_med(mid)
     if err:
         return err, code
+    if med.photo:
+        import config as _config
+        path = os.path.join(_config.MED_PHOTO_DIR, med.photo)
+        if os.path.exists(path):
+            os.remove(path)
     db.session.delete(med)
     db.session.commit()
     return jsonify({'ok': True})
@@ -204,6 +210,59 @@ def medication_toggle(mid):
     med.active = not med.active
     db.session.commit()
     current_app.scheduler.regen(med)
+    return jsonify(serialize_med(med))
+
+
+@api_bp.route('/medications/<int:mid>/photo', methods=['POST'])
+def medication_photo_upload(mid):
+    med, err, code = _get_med(mid)
+    if err:
+        return err, code
+    file = request.files.get('photo')
+    if not file or not file.filename:
+        return jsonify({'error': 'Файл не выбран'}), 400
+    name = (file.filename or '').lower()
+    if not name.endswith(('.png', '.jpg', '.jpeg', '.webp', '.heic', '.heif', '.bmp', '.gif')):
+        return jsonify({'error': 'Формат должен быть изображением'}), 400
+    try:
+        import config as _config
+        from PIL import Image, ImageOps
+        import pillow_heif
+        pillow_heif.register_heif_opener()
+        img = Image.open(file.stream)
+        img = ImageOps.exif_transpose(img)
+        if img.mode in ('RGBA', 'LA', 'P'):
+            bg = Image.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            bg.paste(img, (0, 0), img.split()[-1] if len(img.getbands()) >= 4 else None)
+            img = bg
+        elif img.mode != 'RGB':
+            img = img.convert('RGB')
+        img.thumbnail((640, 640), Image.LANCZOS)
+        os.makedirs(_config.MED_PHOTO_DIR, exist_ok=True)
+        out = os.path.join(_config.MED_PHOTO_DIR, f'{med.id}.jpg')
+        img.save(out, 'JPEG', quality=86)
+        med.photo = f'{med.id}.jpg'
+        db.session.commit()
+    except Exception as e:
+        print('photo upload error:', e)
+        return jsonify({'error': 'Не удалось обработать изображение'}), 400
+    return jsonify(serialize_med(med))
+
+
+@api_bp.route('/medications/<int:mid>/photo', methods=['DELETE'])
+def medication_photo_delete(mid):
+    med, err, code = _get_med(mid)
+    if err:
+        return err, code
+    if med.photo:
+        import config as _config
+        path = os.path.join(_config.MED_PHOTO_DIR, med.photo)
+        if os.path.exists(path):
+            os.remove(path)
+        med.photo = None
+        db.session.commit()
     return jsonify(serialize_med(med))
 
 

@@ -28,6 +28,12 @@ const STATUS_RU = {
   cancelled: 'Отменено',
 };
 
+// Показывает фото (если есть) или иконку-эмодзи
+const iconHtml = (item, cls = '') =>
+  item.photo_url
+    ? '<span class="r-icon ' + cls + '"><img src="' + item.photo_url + '" alt=""></span>'
+    : '<span class="r-icon ' + cls + '">' + escapeHtml(item.icon || '💊') + '</span>';
+
 // ---------- звук ----------
 let _audio = null;
 let _soundBlocked = false;
@@ -129,7 +135,7 @@ function renderReminder() {
   ov.innerHTML =
     '<div class="sheet reminder-sheet">' +
       '<div class="rem-head">' +
-        '<span class="r-icon big">' + escapeHtml(d.icon || '💊') + '</span>' +
+        iconHtml(d, 'big') +
         '<div class="rem-title-block">' +
           '<div class="rem-title">' + escapeHtml(d.med_name || d.title) + '</div>' +
           subtitle +

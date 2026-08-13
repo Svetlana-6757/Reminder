@@ -86,6 +86,7 @@ def serialize_med(med, today=None):
         'meal_label': med.meal_label(),
         'active': med.active,
         'status': status,
+        'photo_url': f'/med-photo/{med.id}' if med.photo else None,
     }
 
 
@@ -107,4 +108,5 @@ def serialize_reminder(r):
         'is_start_prompt': r.is_start_prompt,
         'can_act': r.status in ('pending', 'overdue'),
         'can_start': can_start,
+        'photo_url': f'/med-photo/{med.id}' if med.photo else None,
     }

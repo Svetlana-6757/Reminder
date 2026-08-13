@@ -2,14 +2,16 @@ import os
 
 from flask import Flask
 
-from config import DATA_DIR, DB_PATH, TIMEZONE, SECRET_KEY, BASE_URL
-from .models import db
+from config import (DATA_DIR, DB_PATH, MED_PHOTO_DIR, TIMEZONE, SECRET_KEY,
+                    BASE_URL)
+from .models import db, ensure_schema
 from .assets import ensure_assets
 from .seed import seed_defaults
 
 
 def create_app():
     os.makedirs(DATA_DIR, exist_ok=True)
+    os.makedirs(MED_PHOTO_DIR, exist_ok=True)
 
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DB_PATH.replace('\\', '/')
@@ -21,6 +23,7 @@ def create_app():
     db.init_app(app)
     with app.app_context():
         db.create_all()
+        ensure_schema()
         ensure_assets(app)
         seed_defaults()
 

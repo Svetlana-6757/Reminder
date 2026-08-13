@@ -66,6 +66,13 @@ async function loadDetail() {
       (med.meal_offset_minutes && med.meal_condition !== 'none'
         ? ' (' + med.meal_offset_minutes + ' мин)' : '') + '</div></div>';
 
+  const hero = document.querySelector('.med-hero .r-icon.big');
+  if (hero) {
+    if (med.photo_url) {
+      hero.innerHTML = '<img src="' + med.photo_url + '" alt="">';
+    }
+  }
+
   const desc = document.getElementById('med-desc');
   desc.textContent = med.description;
   if (!med.description) desc.classList.add('hidden');

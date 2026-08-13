@@ -49,7 +49,7 @@ function reminderCard(r) {
 
   d.innerHTML =
     '<div class="r-top">' +
-      '<span class="r-icon">' + escapeHtml(r.icon || '💊') + '</span>' +
+      iconHtml(r) +
       '<div class="r-main">' +
         '<div class="r-name">' + escapeHtml(r.med_name) + promptBadge + '</div>' +
         desc +

@@ -35,7 +35,7 @@ function medCard(m) {
 
   d.innerHTML =
     '<div class="r-top">' +
-      '<span class="r-icon">' + escapeHtml(m.icon) + '</span>' +
+      iconHtml(m) +
       '<div class="r-main">' +
         '<div class="r-name">' + escapeHtml(m.name) + '</div>' +
         '<div class="desc">' + escapeHtml(times) + escapeHtml(meal) + '</div>' +

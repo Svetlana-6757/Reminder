@@ -5,6 +5,19 @@
 </div>
 
 <form id="med-form" class="card form-card" autocomplete="off">
+  <label class="field-label">Фото упаковки <span class="muted small">(из галереи телефона)</span></label>
+  <div class="photo-picker">
+    <input type="file" id="f-photo" accept="image/*" hidden>
+    <div class="photo-preview" id="photo-preview">
+      <span class="photo-placeholder">📷</span>
+    </div>
+    <div class="form-actions" style="margin-top:0">
+      <button type="button" class="btn btn-ghost" id="btn-pick-photo">Загрузить фото</button>
+      <button type="button" class="btn btn-ghost hidden" id="btn-remove-photo">Убрать фото</button>
+    </div>
+  </div>
+  <p class="muted small">Можно добавить снимок коробки лекарства. Если фото нет — вместо него будет иконка 👇</p>
+
   <label class="field-label">Иконка</label>
   <div class="emoji-row">
     {% for e in ['💊','💧','🌿','❤️','🫀','🦴','👁','🍬','💉','🌡','🧪','🩹','⚡','🍵','🧴','👃'] %}
@@ -79,6 +92,7 @@
   {% if med %}
   window.MED_ID = {{ med.id }};
   window.MED_TIMES = {{ med.exact_times_list|tojson }};
+  window.MED_HAS_PHOTO = {{ 'true' if med.photo else 'false' }};
   {% endif %}
 </script>
 <script src="{{ url_for('static', filename='js/form.js') }}"></script>
